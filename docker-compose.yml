@@ -1,0 +1,61 @@
+version: "3"
+services:
+  gitlab:
+    image: 'mtigra/gitlab:lts'
+    container_name: gitlab-container
+    restart: always
+    hostname: 'gitlab'
+    networks:
+     - cinet
+    environment:
+      GITLAB_OMNIBUS_CONFIG: |
+        external_url 'http://localhost:8000'
+    ports:
+      - '8000:8000'
+      - '8443:8443'
+      - '22:22'
+    volumes:
+      - 'gitlab-config:/etc/gitlab'
+      - 'gitlab-logs:/var/log/gitlab'
+      - 'gitlab-data:/var/opt/gitlab'
+
+  jenkins:
+    image: 'mtigra/jenkins:lts'
+    container_name: jenkins-container
+    restart: always
+    hostname: 'jenkins'
+    networks:
+      - cinet
+    ports:
+      - '8080:8080'
+      - '50000:50000'
+    volumes:
+      - 'jenkins_home:/var/jenkins_home'
+      - '/var/run/docker.sock:/var/run/docker.sock'
+
+  sonarqube:
+    image: 'mtigra/sonarqube:lts'
+    container_name: sonarqube-container
+    hostname: 'sonarqube'
+    networks:
+      - cinet
+    ports:
+      - '9000:9000'
+    volumes:
+      - 'sonarqube_conf:/opt/sonarqube/conf'
+      - 'sonarqube_data:/opt/sonarqube/data'
+      - 'sonarqube_logs:/opt/sonarqube/logs'
+      - 'sonarqube_extensions:/opt/sonarqube/extensions'
+networks:
+  cinet:
+    driver: bridge
+
+volumes:
+  gitlab-data:
+  gitlab-logs:
+  gitlab-config:
+  jenkins_home:
+  sonarqube_conf:
+  sonarqube_data:
+  sonarqube_logs:
+  sonarqube_extensions:
